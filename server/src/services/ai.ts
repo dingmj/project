@@ -1,9 +1,34 @@
-import { OpenRouter } from '@openrouter/sdk';
+import axios from 'axios';
 import type { AIAnalysis } from '../types.js';
 
-const openRouter = new OpenRouter({
-  apiKey: process.env.OPENROUTER_API_KEY ?? ''
-});
+// DeepSeek 官方 API（OpenAI 兼容格式）
+const DEEPSEEK_BASE_URL = process.env.DEEPSEEK_BASE_URL ?? 'https://api.deepseek.com';
+const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL ?? 'deepseek-chat';
+
+async function chatCompletion(messages: { role: string; content: string }[], temperature = 0.2, maxTokens = 500): Promise<string> {
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) {
+    throw new Error('DEEPSEEK_API_KEY not set');
+  }
+  const resp = await axios.post(
+    `${DEEPSEEK_BASE_URL}/chat/completions`,
+    {
+      model: DEEPSEEK_MODEL,
+      messages,
+      temperature,
+      max_tokens: maxTokens,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      timeout: 30000,
+    },
+  );
+  const content = resp.data?.choices?.[0]?.message?.content ?? '';
+  return typeof content === 'string' ? content : JSON.stringify(content);
+}
 
 // ========== Query Expansion（查询扩展） ==========
 
@@ -23,16 +48,15 @@ export async function expandKeyword(keyword: string): Promise<string[]> {
   // 不管 AI 是否可用，先提取基础核心词
   const coreTerms = extractCoreTerms(keyword);
 
-  if (!process.env.OPENROUTER_API_KEY) {
+  if (!process.env.DEEPSEEK_API_KEY) {
     const result = [keyword, ...coreTerms];
     expansionCache.set(keyword, result);
     return result;
   }
 
   try {
-    const result = await openRouter.chat.send({
-      model: 'deepseek/deepseek-v3.2',
-      messages: [
+    const rawContent = await chatCompletion(
+      [
         {
           role: 'system',
           content: `你是一个搜索查询扩展专家。给定一个监控关键词，生成该关键词的变体和相关检索词，用于文本匹配。
@@ -53,13 +77,11 @@ export async function expandKeyword(keyword: string): Promise<string[]> {
           content: keyword
         }
       ],
-      temperature: 0.2,
-      maxTokens: 300
-    });
+      0.2,
+      300
+    );
 
-    const rawContent = result.choices[0]?.message?.content || '';
-    const responseContent = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent);
-    const jsonMatch = responseContent.match(/\[[\s\S]*\]/);
+    const jsonMatch = rawContent.match(/\[[\s\S]*\]/);
     if (jsonMatch) {
       const parsed: string[] = JSON.parse(jsonMatch[0]);
       // 确保原始关键词和核心词都在列表中
@@ -152,8 +174,8 @@ export async function analyzeContent(content: string, keyword: string, preMatchR
   // 默认预匹配结果
   const matchResult = preMatchResult ?? { matched: false, matchedTerms: [] };
 
-  if (!process.env.OPENROUTER_API_KEY) {
-    console.warn('OpenRouter API key not configured, using fallback analysis');
+  if (!process.env.DEEPSEEK_API_KEY) {
+    console.warn('DeepSeek API key not configured, using fallback analysis');
     return {
       isReal: true,
       relevance: matchResult.matched ? 50 : 20,
@@ -167,9 +189,8 @@ export async function analyzeContent(content: string, keyword: string, preMatchR
   try {
     const prompt = buildAnalysisPrompt(keyword, matchResult);
 
-    const result = await openRouter.chat.send({
-      model: 'deepseek/deepseek-v3.2',
-      messages: [
+    const rawContent = await chatCompletion(
+      [
         {
           role: 'system',
           content: prompt
@@ -179,15 +200,12 @@ export async function analyzeContent(content: string, keyword: string, preMatchR
           content: content.slice(0, 2000) // 限制内容长度
         }
       ],
-      temperature: 0.2, // 降低温度，提高判断一致性
-      maxTokens: 500
-    });
+      0.2, // 降低温度，提高判断一致性
+      500
+    );
 
-    const rawContent = result.choices[0]?.message?.content || '';
-    const responseContent = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent);
-    
     // 尝试解析 JSON
-    const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
+    const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]);
       return {

@@ -6,7 +6,7 @@ No API keys required. Outputs JSON array to stdout.
 Usage:
     python search_china.py "AI编程"
     python search_china.py "GPT-5" --sources bilibili,weibo
-    python search_china.py "程序员鱼皮" --detect-account
+    python search_china.py "加格" --detect-account
 """
 
 import argparse
@@ -17,6 +17,10 @@ import sys
 import time
 import uuid
 from datetime import datetime, timezone
+
+# 修复 Windows 控制台 GBK 编码导致的中文/emoji JSON 输出崩溃
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 try:
     import requests

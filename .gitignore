@@ -5,3 +5,5 @@ dist/
 *.db-journal
 .DS_Store
 .idea/
+__pycache__/
+*.pyc

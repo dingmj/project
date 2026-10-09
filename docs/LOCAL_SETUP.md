@@ -19,8 +19,8 @@
 ## 第一步：克隆项目
 
 ```bash
-git clone https://github.com/liyupi/yupi-hot-monitor.git
-cd yupi-hot-monitor
+git clone https://github.com/你的用户名/dingzhen-hot-monitor.git
+cd dingzhen-hot-monitor
 ```
 
 > 如果 GitHub 访问较慢，可以在 Gitee 上导入仓库后克隆。
@@ -31,16 +31,14 @@ cd yupi-hot-monitor
 
 项目需要 **1 个必需的 API Key**，另外 2 个为可选。
 
-### ✅ 必需：OpenRouter API Key
+### ✅ 必需：DeepSeek API Key
 
-OpenRouter 是一个统一的 AI 大模型接入平台，注册即可使用。
+DeepSeek 提供与本项目 OpenAI 兼容的官方 API，用于 AI 内容分析。
 
-1. 打开 [https://openrouter.ai/](https://openrouter.ai/)，注册并登录
-2. 进入 [API Keys 页面](https://openrouter.ai/settings/keys)
-3. 点击 **Create Key**，复制生成的 Key（以 `sk-or-v1-` 开头）
-4. 确保账户有一定额度（新用户通常有免费额度）
-
-> 💡 如果账户没有额度，需要在 [Credits 页面](https://openrouter.ai/settings/credits) 充值少量金额（几美元即可用很久）。
+1. 打开 [https://platform.deepseek.com/](https://platform.deepseek.com/)，注册并登录
+2. 进入 [API Keys 页面](https://platform.deepseek.com/api_keys)
+3. 点击 **创建 API Key**，复制生成的 Key（以 `sk-` 开头）
+4. 在「充值」页面给账户充一点余额（几块钱就能用很久）
 
 ### 🔧 可选：Twitter API Key
 
@@ -79,8 +77,8 @@ DATABASE_URL="file:./dev.db"
 PORT=3001
 CLIENT_URL=http://localhost:5173
 
-# ✅ 必填：OpenRouter AI
-OPENROUTER_API_KEY=sk-or-v1-你的key粘贴到这里
+# ✅ 必填：DeepSeek AI
+DEEPSEEK_API_KEY=sk-你的key粘贴到这里
 
 # 🔧 选填：Twitter API（不填则不抓取 Twitter 数据）
 TWITTER_API_KEY=你的twitter_api_key
@@ -212,7 +210,7 @@ npx prisma generate
 ### Q3：热点搜索没有结果
 
 **可能原因**：
-1. OpenRouter API Key 未填写或额度不足 → 检查 `.env` 中的 `OPENROUTER_API_KEY`
+1. DeepSeek API Key 未填写或余额不足 → 检查 `.env` 中的 `DEEPSEEK_API_KEY`
 2. 关键词太冷门 → 尝试更热门的关键词，如 "AI"、"ChatGPT"
 3. 网络问题导致搜索引擎爬虫失败 → 检查终端日志中是否有报错信息
 

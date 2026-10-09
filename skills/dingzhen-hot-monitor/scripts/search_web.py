@@ -18,6 +18,10 @@ import math
 from datetime import datetime, timezone, timedelta
 from urllib.parse import urlencode, urlparse, parse_qs, unquote
 
+# 修复 Windows 控制台 GBK 编码导致的中文/emoji JSON 输出崩溃
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 try:
     import requests
     from bs4 import BeautifulSoup

@@ -1,21 +1,47 @@
 # 🔌 API 集成技术文档
 
-## 1. OpenRouter API 集成
+## 1. DeepSeek API 集成（OpenAI 兼容）
 
-### 1.1 SDK 安装
+本项目使用 DeepSeek 官方 API（`https://api.deepseek.com`），接口与 OpenAI 格式兼容，无需额外的 SDK，直接使用已安装的 `axios` 请求即可。
 
-```bash
-npm install @openrouter/sdk
+### 1.1 环境变量
+
+`server/.env` 中配置：
+
+```env
+DEEPSEEK_API_KEY=sk-你的key
+# 可选自定义项（一般无需改动）
+# DEEPSEEK_BASE_URL=https://api.deepseek.com
+# DEEPSEEK_MODEL=deepseek-chat
 ```
 
 ### 1.2 基本配置
 
 ```typescript
-import { OpenRouter } from "@openrouter/sdk";
+import axios from "axios";
 
-const openRouter = new OpenRouter({
-  apiKey: process.env.OPENROUTER_API_KEY ?? "",
-});
+const DEEPSEEK_BASE_URL = process.env.DEEPSEEK_BASE_URL ?? "https://api.deepseek.com";
+const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL ?? "deepseek-chat";
+
+async function chatCompletion(messages, temperature = 0.2, maxTokens = 500) {
+  const resp = await axios.post(
+    `${DEEPSEEK_BASE_URL}/chat/completions`,
+    {
+      model: DEEPSEEK_MODEL,
+      messages,
+      temperature,
+      max_tokens: maxTokens,
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+      },
+      timeout: 30000,
+    }
+  );
+  return resp.data?.choices?.[0]?.message?.content ?? "";
+}
 ```
 
 ### 1.3 Chat Completion 调用
@@ -23,9 +49,8 @@ const openRouter = new OpenRouter({
 ```typescript
 // 非流式调用
 async function analyzeHotspot(content: string) {
-  const result = await openRouter.chat.send({
-    model: "openai/gpt-4",
-    messages: [
+  const rawContent = await chatCompletion(
+    [
       {
         role: "system",
         content: `你是一个热点分析专家，请分析以下内容：
@@ -47,23 +72,24 @@ async function analyzeHotspot(content: string) {
         content: content
       }
     ],
-    stream: false,
-    temperature: 0.3,
-    maxTokens: 500
-  });
+    0.3,
+    500
+  );
 
-  return JSON.parse(result.choices[0].message.content);
+  return JSON.parse(rawContent);
 }
 ```
 
 ### 1.4 响应格式
+
+DeepSeek 返回 OpenAI 兼容的 chat.completion 格式：
 
 ```json
 {
   "id": "chatcmpl-xxxxxxxxxxxxxxxxx",
   "object": "chat.completion",
   "created": 1677652288,
-  "model": "openai/gpt-4",
+  "model": "deepseek-chat",
   "choices": [
     {
       "index": 0,
@@ -81,6 +107,8 @@ async function analyzeHotspot(content: string) {
   }
 }
 ```
+
+> 💡 可使用 `DEEPSEEK_MODEL` 切换模型：`deepseek-chat`（V3 聊天模型）或 `deepseek-reasoner`（深度推理模型）。
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: hot-monitor
+name: dingzhen-hot-monitor
 description: >
   AI hotspot monitoring and trending topic discovery across multiple sources (Bing, Google, DuckDuckGo, HackerNews,
   Sogou, Bilibili, Weibo, Twitter). Use when users ask about: trending news, hot topics, latest developments in a field,
@@ -8,7 +8,7 @@ description: >
   current events and trending content across Chinese and international platforms.
 ---
 
-# Hot Monitor — AI 热点监控技能
+# DingZhen Hot Monitor — AI 热点监控技能
 
 Search and analyze trending topics across 8+ sources without any server or database. Scripts handle data collection; use your own AI capabilities for analysis.
 
@@ -125,7 +125,7 @@ For better coverage, expand the user's keyword into variants before searching:
 `search_china.py` supports `--detect-account` flag. If the keyword matches a Bilibili creator's name, it fetches their latest videos instead of doing a generic search:
 
 ```bash
-python scripts/search_china.py "程序员鱼皮" --detect-account
+python scripts/search_china.py "加格" --detect-account
 ```
 
 ### Multi-keyword Batch

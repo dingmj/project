@@ -1,4 +1,4 @@
-# 🔥 热点监控工具 (Yupi Hot Monitor)
+# 🔥 加格热点监控 (DingZhen Hot Monitor)
 
 > 一款自动发现热点、智能识别真假内容、实时推送通知的 AI 工具
 
@@ -33,7 +33,7 @@
 | 前端 | React + Vite + TailwindCSS | 响应式、赛博朋克风格 UI |
 | 后端 | Node.js + Express | 轻量级 API 服务 |
 | 数据库 | SQLite + Prisma | 轻量存储、ORM |
-| AI 服务 | OpenRouter API | 热点验证、内容分析 |
+| AI 服务 | DeepSeek API | 热点验证、内容分析 |
 | 定时任务 | node-cron | 定时热点抓取 |
 | 实时通信 | Socket.io | 浏览器推送 |
 | 邮件 | Nodemailer | 邮件通知 |
@@ -49,7 +49,7 @@
 ## 📁 项目结构
 
 ```
-yupi-hot-monitor/
+dingzhen-hot-monitor/
 ├── docs/                    # 文档目录
 │   ├── README.md           # 项目说明
 │   ├── REQUIREMENTS.md     # 需求文档
@@ -83,8 +83,8 @@ yupi-hot-monitor/
 ## ⚙️ 配置说明
 
 ```env
-# OpenRouter AI
-OPENROUTER_API_KEY=your_openrouter_key
+# DeepSeek AI
+DEEPSEEK_API_KEY=your_deepseek_key
 
 # Twitter API (twitterapi.io)
 TWITTER_API_KEY=your_twitter_api_key
@@ -124,7 +124,7 @@ cd client && npm run dev
 - [ ] 项目初始化
 - [ ] 后端 API 开发
 - [ ] 数据源对接
-- [ ] AI 集成 (OpenRouter)
+- [ ] AI 集成 (DeepSeek)
 - [ ] 前端页面开发
 - [ ] 通知系统开发
 - [ ] 测试与验收

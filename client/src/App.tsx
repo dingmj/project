@@ -366,7 +366,7 @@ function App() {
                 <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[#050510] animate-pulse" />
               </div>
               <div>
-                <h1 className="text-lg font-semibold text-white tracking-tight">HotPulse</h1>
+                <h1 className="text-lg font-semibold text-white tracking-tight">加格热点</h1>
                 <p className="text-xs text-slate-500">AI 热点雷达</p>
               </div>
             </div>

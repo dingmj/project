@@ -19,6 +19,10 @@ import math
 import sys
 from datetime import datetime, timezone
 
+# 修复 Windows 控制台 GBK 编码导致的中文/emoji 输出崩溃
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 
 def calc_heat_score(item):
     """Calculate composite heat score from engagement metrics."""
